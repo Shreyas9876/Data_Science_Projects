@@ -1,6 +1,7 @@
 Title: Stock Price Prediction Using Machine Learning
 
 Project URL: https://shreyas9876-data-science-projects-app-a5zelz.streamlit.app/
+
 GitHub Repository: https://github.com/Shreyas9876/Data_Science_Projects.git
 
 Overview
