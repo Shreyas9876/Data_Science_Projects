@@ -1,11 +1,12 @@
-pandas
-numpy
-seaborn
-matplotlib
-scikit-learn
-catboost
-xgboost
-Flask
-beautifulsoup4
+pandas==2.2.3
+numpy==2.2.4
+seaborn==0.13.2
+matplotlib==3.10.1
+scikit-learn==1.6.1
+joblib==1.4.2
+catboost==1.2.8
+xgboost==3.0.0
+Flask==3.1.0
+beautifulsoup4==4.13.3
 
 -e .
