@@ -1,61 +1,61 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import joblib
-import matplotlib.pyplot as plt
+import os
 
-# Load model and preprocessor
+# 🔁 Required imports for loading the joblib files
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from xgboost import XGBRegressor  # Replace with the correct model if different
+
+# 📂 Load model and preprocessor
 def load_model():
-    preprocessor = joblib.load("artifacts/preprocessor.pkl")
-    model = joblib.load("artifacts/model.pkl")
-    return preprocessor, model
+    try:
+        preprocessor = joblib.load("artifacts/preprocessor.pkl")
+        model = joblib.load("artifacts/model.pkl")
+        return preprocessor, model
+    except FileNotFoundError:
+        st.error("❌ Model or preprocessor file not found. Please train the model first.")
+        st.stop()
+    except Exception as e:
+        st.error(f"❌ Failed to load model: {str(e)}")
+        st.stop()
 
-# Make prediction
-def make_prediction(preprocessor, model, input_data):
-    transformed_data = preprocessor.transform(input_data)
-    prediction = model.predict(transformed_data)
+# 🧠 Make prediction
+def predict(preprocessor, model, input_df):
+    processed_data = preprocessor.transform(input_df)
+    prediction = model.predict(processed_data)
     return prediction
 
-# Streamlit UI
-st.set_page_config(page_title="Stock Price Predictor", layout="wide")
+# 🎯 Streamlit UI
+def main():
+    st.title("📈 Stock Price Predictor")
 
-st.title("📈 Stock Price Predictor")
-st.subheader("Predict future stock prices using machine learning")
+    st.markdown("""
+    Enter the stock data below to predict the future closing price.
+    """)
 
-with st.sidebar:
-    st.header("User Input Features")
-    ticker = st.text_input("Ticker Symbol", "AAPL")
-    open_price = st.number_input("Open Price", value=150.0)
-    high_price = st.number_input("High Price", value=153.0)
-    low_price = st.number_input("Low Price", value=149.0)
-    adj_close = st.number_input("Adjusted Close Price", value=152.0)
-    volume = st.number_input("Volume", value=1000000)
+    # Replace these with your actual input features
+    open_price = st.number_input("Open Price", min_value=0.0, value=100.0)
+    high_price = st.number_input("High Price", min_value=0.0, value=105.0)
+    low_price = st.number_input("Low Price", min_value=0.0, value=95.0)
+    volume = st.number_input("Volume", min_value=0.0, value=1_000_000.0)
 
-    input_df = pd.DataFrame({
-        'Ticker': [ticker],
-        'Open': [open_price],
-        'High': [high_price],
-        'Low': [low_price],
-        'Adj Close': [adj_close],
-        'Volume': [volume]
-    })
+    input_data = {
+        "Open": [open_price],
+        "High": [high_price],
+        "Low": [low_price],
+        "Volume": [volume]
+    }
 
-    if st.button("Predict"):
+    input_df = pd.DataFrame(input_data)
+
+    if st.button("Predict Closing Price"):
         preprocessor, model = load_model()
-        prediction = make_prediction(preprocessor, model, input_df)
+        prediction = predict(preprocessor, model, input_df)
+        st.success(f"📊 Predicted Closing Price: ₹{prediction[0]:,.2f}")
 
-        st.success(f"Predicted Close Price: ${prediction[0]:.2f}")
-
-        # Display prediction as a metric
-        st.metric(label="📊 Predicted Price", value=f"${prediction[0]:.2f}", delta=f"{prediction[0] - adj_close:.2f}")
-
-        # Line Chart Comparison
-        st.subheader("📉 Price Comparison Chart")
-        fig, ax = plt.subplots()
-        ax.plot(['Adj Close', 'Predicted'], [adj_close, prediction[0]], marker='o')
-        ax.set_ylabel("Price ($)")
-        ax.set_title("Actual vs Predicted")
-        st.pyplot(fig)
-
-# Footer
-st.markdown("---")
-st.markdown("Created with ❤️ using Streamlit")
+if __name__ == "__main__":
+    main()
