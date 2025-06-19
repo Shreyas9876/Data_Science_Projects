@@ -9,4 +9,5 @@ xgboost==3.0.0
 Flask==3.1.0
 beautifulsoup4==4.13.3
 
--e .
+# Link to your project
+-e git+https://github.com/Shreyas9876/Data_Science_Projects@cc8eba64e0fc1bbaa4350199ba485073f17ca8d8#egg=Stock_Market
